@@ -1,0 +1,10 @@
+kubectl get nodes
+kubectl get nodes -o wide
+kubectl get nodes -o json
+kubectl get nodes -o yaml
+
+kubectl describe nodes
+kubectl describe nodes master
+kubectl describe nodes worker1
+
+

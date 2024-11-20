@@ -1,0 +1,285 @@
+hostname -I
+vi /etc/hosts
+cat /etc/os-release
+
+#All Node Host entry
+--------------------
+10.0.0.5  master
+10.0.0.6  worker1
+10.0.0.7  worker2
+
+ping <hostname>
+
+#swapoff
+swapon -s
+free -m
+swapoff -a
+vi /etc/fstab
+
+#install Docker 
+-----------------
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+
+#install Command
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+sudo systemctl restart docker.service
+sudo systemctl enable docker
+sudo systemctl status docker
+sudo systemctl start docker
+
+#check version command
+docker --version
+
+#Must be (Cgroup Driver: systemd)
+docker info | grep -i driver
+
+
+
+#Install Kubernetes
+--------------------
+dpkg -l | grep kube
+
+#Add Kubernetes Signing Key/Add Software Repositories
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+apt-get update
+
+
+#Step 3: Install Kubernetes Tools
+apt-get install kubeadm kubelet kubectl -y
+
+#Check Version
+kubeadm version
+kubectl version
+kubelet --version
+dpkg -l | grep kube
+
+#Network
+lsmod |grep overlay
+lsmod |grep br_netfilter
+cd /etc/modules-load.d/
+vi containerd.conf     
+OR
+vi /etc/modules-load.d/containerd.conf
+		# Add the following two lines to the file:
+		overlay
+		br_netfilter
+
+cat /etc/modules-load.d/containerd.conf
+modprobe overlay
+modprobe br_netfilter
+
+cat /proc/sys/net/ipv4/ip_forward
+
+cd /etc/sysctl.d/
+vi 10-k8s.conf    
+OR
+vi /etc/sysctl.d/10-k8s.conf
+	#Add the following lines to the file:
+		net.bridge.bridge-nf-call-ip6tables = 1
+		net.bridge.bridge-nf-call-iptables = 1
+		net.ipv4.ip_forward = 1
+
+#Reload the configuration by typing:
+sysctl --system
+
+#Initialize Kubernetes on Master Node
+vi /etc/default/kubelet
+			
+			#Add the following line to the file:
+			KUBELET_EXTRA_ARGS="--cgroup-driver=cgroupfs"
+			
+cat /etc/default/kubelet
+systemctl daemon-reload && systemctl restart kubelet
+
+
+#Network
+kubeadm init --pod-network-cidr=10.244.0.0/16
+systemctl status containerd.service
+cd /etc/containerd/
+rm -fr config.toml
+systemctl restart containerd.service
+systemctl status containerd.service
+kubeadm init --pod-network-cidr=10.244.0.0/16
+
+
+kubectl get nodes
+export KUBECONFIG=/etc/kubernetes/admin.conf
+kubectl get nodes
+kubectl get nodes -o wide
+env | grep -i kube
+
+#root directory
+cd
+vi .bashrc
+	export KUBECONFIG=/etc/kubernetes/admin.conf
+kubectl get nodes
+source .bashrc
+kubectl get nodes
+kubectl get nodes -o wide
+env | grep -i kube
+
+
+kubectl get pods -A
+#Download and apply flannel network plugins 
+wget https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
+cat kube-flannel.yml
+cat kube-flannel.yml | grep -i network
+kubectl apply -f kube-flannel.yml
+kubectl get pods -A
+kubectl get nodes
+kubectl get nodes -o wide
+
+
+kubectl get ns
+kubectl get namespaces
+
+#kubectl bash completion 
+dpkg -l | grep bash-completion 
+kubectl completion bash | sudo tee /etc/bash_completion.d/kubectl > /dev/null
+logout
+
+#Add Worker Nodes
+------------------
+#install Docker 
+-----------------
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+
+#install Command
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+sudo systemctl restart docker.service
+sudo systemctl enable docker
+sudo systemctl status docker
+sudo systemctl start docker
+
+#check version command
+docker --version
+
+#Must be (Cgroup Driver: systemd)
+docker info | grep -i driver
+
+dpkg -l | grep kube
+
+#Add Kubernetes Signing Key/Add Software Repositories
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+apt-get update
+
+
+#Step 3: Install Kubernetes Tools
+apt-get install kubeadm kubelet -y
+
+cat /proc/sys/net/ipv4/ip_forward
+
+#Network
+lsmod |grep overlay
+lsmod |grep br_netfilter
+cd /etc/modules-load.d/
+vi containerd.conf     
+OR
+vi /etc/modules-load.d/containerd.conf
+		# Add the following two lines to the file:
+		overlay
+		br_netfilter
+
+cat /etc/modules-load.d/containerd.conf
+modprobe overlay
+modprobe br_netfilter
+
+cat /proc/sys/net/ipv4/ip_forward
+
+cd /etc/sysctl.d/
+vi 10-k8s.conf    
+OR
+vi /etc/sysctl.d/10-k8s.conf
+	#Add the following lines to the file:
+		net.bridge.bridge-nf-call-ip6tables = 1
+		net.bridge.bridge-nf-call-iptables = 1
+		net.ipv4.ip_forward = 1
+
+systemctl daemon-reload && systemctl restart kubelet
+		
+#Error show then run command
+
+cd /etc/containerd/
+rm -fr config.toml
+systemctl restart containerd.service
+systemctl status containerd.service
+
+
+#cluster joining command
+
+#Check Version
+kubeadm version
+kubelet version
+dpkg -l | grep kube
+
+
+
+
+#run container
+----------------
+kubectl get pods
+kubectl run pod1 --image nginx
+kubectl get pods
+kubectl get pods -o wide
+
+kubectl delete pod pod1
+
+
+#Create Join token
+---------------------
+kubeadm token create
+kubeadm token create --print-join-command
+
+
+
+
+#Resert problem troubleshooting Worker Nodes
+vi /etc/default/kubelet
+			
+			#Add the following line to the file:
+			KUBELET_EXTRA_ARGS="--cgroup-driver=cgroupfs"
+			
+cat /etc/default/kubelet
+systemctl daemon-reload && systemctl restart kubelet
+
+#single Node q(Master+Worker)
+kubectl describe nodes k8smaster1
+kubectl describe nodes k8smaster1 | grep -i taint
+kubectl taint node k8smaster1 node-role.kubernetes.io/control-plane:NoSchedule-
+		Output: node/k8smaster1 untainted
+
+
+
+
+
+

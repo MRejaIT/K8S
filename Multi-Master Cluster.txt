@@ -1,0 +1,79 @@
+Install HA Proxy in Proxy Node
+-----------------------------------
+apt-get install haproxy -y
+
+cat <<azuser > /etc/haproxy/haproxy.cfg
+frontend kubernetes
+    bind *:6443
+    option tcplog
+    mode tcp
+    default_backend kubernetes-masters
+
+backend kubernetes-masters
+    mode tcp
+    balance roundrobin
+    option tcp-check
+    server K8SMater1 10.0.0.6:6443 check
+    server K8SMater2 10.0.0.7:6443 check
+    server K8SMater3 10.0.0.8:6443 check
+azuser
+
+systemctl restart haproxy
+systemctl enable haproxy
+
+============================================
+hostname -I
+vi /etc/hosts
+cat /etc/os-release
+
+#swapoff
+swapon -s
+free -m
+swapoff -a
+vi /etc/fstab
+
+#install Docker 
+-----------------
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+
+#install Command
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+sudo systemctl restart docker.service
+sudo systemctl enable docker
+sudo systemctl status docker
+sudo systemctl start docker
+
+#check version command
+docker --version
+
+#Must be (Cgroup Driver: systemd)
+docker info | grep -i driver
+
+#Add Kubernetes Signing Key/Add Software Repositories
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+apt-get update
+
+#Step 3: Install Kubernetes Tools
+apt-get install kubeadm kubelet kubectl
+
+#Check Version
+kubeadm version
+kubectl version
+kubelet --version
+dpkg -l | grep kube
+

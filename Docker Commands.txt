@@ -1,0 +1,99 @@
+Install Docker
+---------------------------------------------------------------------------------------------------------
+#Update your system:
+sudo apt update
+
+#Install prerequisites:
+sudo apt install -y curl gnupg2
+
+#Add Docker’s official GPG key:
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+#Add Docker’s repository to APT sources:
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+#Update APT package index:
+sudo apt update
+
+#Install Docker Engine:
+sudo apt install -y docker-ce docker-ce-cli containerd.io
+
+#Verify Docker installation:
+sudo docker run hello-world
+
+#Add your user to the Docker group (optional but recommended):
+sudo usermod -aG docker $USER
+
+
+
+#Basic Commands
+ docker version /docker -v
+ docker info
+ 
+#Show running container 
+ docker ps / docker container ps
+ 
+#Search commands
+ docker search web
+ docker search web --limit 5
+ 
+#Show all Containers
+ docker ps -a
+ 
+#Download Images
+ docker pull nginx
+ 
+# Image history
+ docker history nginx:latest
+ 
+# Create conatiner
+ docker create nginx
+ dokcer start <imgae ID>
+ 
+#Show logs 
+ docker logs <container name>
+ 
+#Create and run conttainer
+docker run -d --name web nginx
+ docker run -dit --name web nginx
+ 
+# Show Images
+ docker images
+ docker image ls 
+ docker images -a
+
+#Delete Containers
+ docker rm <container name>
+ docker ps -aq (show all container ID)
+ docker rm $(docker ps -aq) <Delete all container>
+ docker start $(docker ps -aq) <start all container>
+ docker stop $(docker ps -aq) <Stop all container>
+ ctrl pq (Runing container backround running)
+ 
+#Detele Images
+ docker rmi <image name>
+
+#Show docker containers IP Tables/ Rules
+ iptables -t nat -L
+ 
+#Create and run conttainer with port mapping
+ docker run -dit --name web -p 80:80 nginx
+
+#Install Bash-Completion (Working TAB)
+ apt-get install bash-completion
+ 
+#Remote commands excution
+ docker exec os1 pwd
+ docker exec -it os1 /bin/bash 
+ 
+ 
+
+
+ 
+
+ 
+ 
+
+
+
+
