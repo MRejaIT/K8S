@@ -54,4 +54,7 @@ kubectl explain replicaset
 #Create a pod using yaml
 kubectl apply -f single.yaml --dry-run
 
+kubectl apply -f single.yaml
+
+kubectl get pods
 
