@@ -57,4 +57,25 @@ kubectl apply -f single.yaml --dry-run
 kubectl apply -f single.yaml
 
 kubectl get pods
+kubectl run pod2 --image nginx --dry-run=client -o yaml
+# Output
+----------------------------
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: pod2
+  name: pod2
+spec:
+  containers:
+  - image: nginx
+    name: pod2
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+------------------------------
+
+    
 
