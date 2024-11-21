@@ -87,5 +87,6 @@ kubectl exec -it multicontainer /bin/bash   #login container
 kubectl exec -it multicontainer /bin/sh     #login container
 
 
-    
+#Deploy Replicas
+ kubectl create deployment demodep1 --image nginx --replicas 10
 
