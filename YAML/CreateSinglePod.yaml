@@ -6,3 +6,7 @@ spce:
  containers: 
  - name: container
    image: httpd
+
+#kubectl apply -f single.yaml --dry-run (check  yaml file)
+
+
