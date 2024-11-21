@@ -1,8 +1,10 @@
 apiVersion: v1
 kind: Pod
 metadata:
- name: singlepod
+ name: multicontainer
 spec:
  containers: 
- - name: container
-   image: httpd
+ - name: doc1
+   image: nginx
+ - name: doc2
+   image: redis

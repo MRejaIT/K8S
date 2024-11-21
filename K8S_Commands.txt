@@ -24,6 +24,11 @@ kubectl get pods -A
 kubectl get pods -n kube-system
 kubectl get pods -n kube-flannel
 
+#Live watch pods
+watch kubectl get pods
+watch kubectl get pods <container name>
+
+
 
 kubectl run -h
 kubectl run pod1 --image nginx
@@ -53,7 +58,6 @@ kubectl explain replicaset
 
 #Create a pod using yaml
 kubectl apply -f single.yaml --dry-run
-
 kubectl apply -f single.yaml
 
 kubectl get pods
@@ -76,6 +80,7 @@ spec:
   restartPolicy: Always
 status: {}
 ------------------------------
+
 
     
 
