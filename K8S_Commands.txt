@@ -7,4 +7,51 @@ kubectl describe nodes
 kubectl describe nodes master
 kubectl describe nodes worker1
 
+#Kubernetes Objects list (Search google)
+
+kubectl api-resources
+
+kubectl get namespaces
+kubectl get ns
+kubectl create ns production
+kubectl describe namespaces production
+kubectl delete namespaces production
+
+
+kubectl get pods
+kubectl get pods -o wide
+kubectl get pods -A
+kubectl get pods -n kube-system
+kubectl get pods -n kube-flannel
+
+
+kubectl run -h
+kubectl run pod1 --image nginx
+curl 10.244.1.14
+curl http://10.244.1.14
+kubectl describe pods pod1
+kubectl logs pod/pod1
+
+
+kubectl delete pods pod1
+kubectl delete pods --all
+
+kubectl create namespace ns1
+kubectl run pod1 --image nginx --namespace ns1
+kubectl get pods -n ns1
+kubectl delete pods -n ns1 pod1
+kubectl delete pods -n ns1 --all
+
+
+kubectl get pods -n kube-system | wc -l
+
+
+kubectl explain namespace
+kubectl explain pod
+kubectl explain replicaset
+
+
+#Create a pod using yaml
+kubectl apply -f single.yaml --dry-run
+
 
