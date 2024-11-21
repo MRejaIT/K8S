@@ -59,11 +59,11 @@ kubectl explain replicaset
 
 
 #Create a pod using yaml
-kubectl apply -f single.yaml --dry-run
-kubectl apply -f single.yaml
+ kubectl apply -f single.yaml --dry-run
+ kubectl apply -f single.yaml
 
-kubectl get pods
-kubectl run pod2 --image nginx --dry-run=client -o yaml
+ kubectl get pods
+ kubectl run pod2 --image nginx --dry-run=client -o yaml
 # Output
 ----------------------------
 apiVersion: v1
@@ -83,10 +83,32 @@ spec:
 status: {}
 ------------------------------
 
-kubectl exec -it multicontainer /bin/bash   #login container
-kubectl exec -it multicontainer /bin/sh     #login container
+ kubectl exec -it multicontainer /bin/bash   #login container
+ kubectl exec -it multicontainer /bin/sh     #login container
 
 
 #Deploy Replicas
  kubectl create deployment demodep1 --image nginx --replicas 10
+ kubectl delete deployments.apps <deployment name>
+ kubectl scale deployment <deployment name> --replicas 0                    #Scale out 
+ kubectl scale deployment <deployment name> --replicas 10                   #Scale In
+
+
+#Edit pods
+ kubectl edit pod <pod name>   #Change only image but not change name or not add container image.but output yaml file provide
+ kubectl describe pod pod1 | grep -i image
+ kubectl describe pod pod1 | more 
+ kubectl set image pods/pod1 pod1=nginx
+
+
+#kubectl apply/create/replace 
+ kubectl create -f <yaml file>             # newcreate resources
+ kubectl apply -f <yaml file>              # changeable yaml file info update pod
+ kubectl replace -f <yaml file>            # replace pod
+ kubectl replace -f <yaml file> --force    # delete+new create 
+ 
+
+ 
+ 
+
 
