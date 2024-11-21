@@ -27,6 +27,7 @@ kubectl get pods -n kube-flannel
 #Live watch pods
 watch kubectl get pods
 watch kubectl get pods <container name>
+kubectl get pods -w
 
 
 
@@ -38,8 +39,9 @@ kubectl describe pods pod1
 kubectl logs pod/pod1
 
 
-kubectl delete pods pod1
-kubectl delete pods --all
+kubectl delete pods pod1                  # Delete spacefic pod
+kubectl delete pods --all                 # All pods delete
+kubectl delete pods --all --force         # Force All pods delete
 
 kubectl create namespace ns1
 kubectl run pod1 --image nginx --namespace ns1
@@ -80,6 +82,9 @@ spec:
   restartPolicy: Always
 status: {}
 ------------------------------
+
+kubectl exec -it multicontainer /bin/bash   #login container
+kubectl exec -it multicontainer /bin/sh     #login container
 
 
     
