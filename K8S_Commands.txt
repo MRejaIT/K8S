@@ -106,7 +106,17 @@ status: {}
  kubectl apply -f <yaml file>              # changeable yaml file info update pod
  kubectl replace -f <yaml file>            # replace pod
  kubectl replace -f <yaml file> --force    # delete+new create 
+
+
+#Login container shells or run command
+ kubectl exec pods/pod1 -- pwd
+ kubectl exec pods/pod1 -- date
+ kubectl exec pods/pod1 -- hostname
+ kubectl exec -it pods/pod1 -- /bin/bash
+ kubectl exec -it pods/pod1 -- /bin/sh 
  
+
+
 
  
  
