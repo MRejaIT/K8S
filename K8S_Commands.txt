@@ -112,9 +112,37 @@ status: {}
  kubectl exec pods/pod1 -- pwd
  kubectl exec pods/pod1 -- date
  kubectl exec pods/pod1 -- hostname
- kubectl exec -it pods/pod1 -- /bin/bash
- kubectl exec -it pods/pod1 -- /bin/sh 
- 
+ kubectl exec pods/<podname> -- "command"
+ kubectl exec pods/<podname> -c <containername> -- "command"
+ #Example
+   kubectl exec -it pods/pod1 -- /bin/bash
+   kubectl exec -it pods/pod1 -- /bin/sh 
+
+#copy contents from host to pod
+ kubectl cp <source> <pod-name>:<destination>
+ kubectl cp <source> <pod-name>:<destination> -c <containername>
+ #Example
+  kubectl cp index.html multicontainer:/usr/share/nginx/html/
+  kubectl cp index.html multicontainer:/tmp -c redis
+
+
+#copy contents from pod to host
+ kubectl cp <source> <pod-name>:<sourcefilewithpath> <destination-must-with-file-name>
+ kubectl cp <source> <pod-name>:<sourcefilewithpath> <destination-must-with-file-name> -c <containername>
+#Example
+ kubectl cp -n default multicontainer:/usr/share/nginx/html/index.html /tmp/abc
+ kubectl cp -n default multicontainer:/usr/share/nginx/html/index.html ./index.html
+ kubectl cp multicontainer:/usr/share/nginx/html/index.html ./index.html
+ kubectl cp multicontainer:/usr/share/nginx/html/index.html ./index.html -c doc2
+ kubectl cp dhaka/ multicontainer:/tmp   #Directoy copy
+
+
+#Logs 
+ kubectl logs pods <podname>
+ kubectl logs pods <podname> -c <containername>
+ kubectl logs pods <podname -c <containername> --since=1h
+ kubectl logs pods <podname -c <containername> --tail=10
+ kubectl logs pods <podname> -c <containername> -f
 
 
 
