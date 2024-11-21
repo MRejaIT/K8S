@@ -4,3 +4,5 @@ metadata:
  name: singlepod
 spce:
  containers: 
+ - name: container
+   image: httpd
