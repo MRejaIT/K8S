@@ -77,3 +77,5 @@ kubectl version
 kubelet --version
 dpkg -l | grep kube
 
+#Kubernetes init
+kubeadm init --control-plane-endpoint "192.168.91.70:6443" --upload-certs --pod-network-cidr=10.244.0.0/16
