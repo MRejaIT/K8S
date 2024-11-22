@@ -141,12 +141,75 @@ status: {}
  kubectl logs pods <podname>
  kubectl logs pods <podname> -c <containername>
  kubectl logs pods <podname -c <containername> --since=1h
- kubectl logs pods <podname -c <containername> --tail=10
+ kubectl logs pods <podname -c <containername> --tail 10
  kubectl logs pods <podname> -c <containername> -f
 
 
+#Pod Restart Policy 
+ #type of restart policy
+ kubectl run always --imgae ubuntu #Default policy always
+ kubectl run never --image ubuntu --restart Never  #No Restart 
+ kubectl run onfailure --image ubuntu --restart OnFailure   #Just failed time restart this pods
+ kubectl get pods always -o yaml | grep -i restart
 
- 
- 
+  
+#Side  car container
+
+#init container
+apiVersion: v1
+kind: Pod
+metadata:
+ name: pod1
+spec:
+containers:
+ - name: container1
+   image: nginx
+initContainers:
+ - name: containers2
+   image: redis
+
+
+--------------------------
+
+apiVersion: v1
+kind: Pod
+metadata:
+ name: pod1
+spec:
+containers:
+ - name: container1
+   image: nginx
+initContainers:
+ - name: containers2
+   image: ubuntu
+
+
+
+#Service + Label in Kubernetes
+ #type of Service
+  1. ClusterIP
+  2. NodePort
+  3. Loadbalancer
+  4. ExternalName
+
+kubectl get service #Build in service
+kubectl create service clusterip svc1 --tcp 80
+kubectl describe service <service name>
+kubectl edit service <service name>
+kubectl get service --show-labels
+kubectl edit pod <pod name>
+kubectl label pod webapp2 app=svc1
+kubectl label --overwrite pods <pod_name> key=new_value
+kubectl create service clusterip --clusterip 10.97.101.55 --tcp 81:80 svc2
+
+kubectl run pod1 --image nginx --port 80 --expose
+
+
+iptables -t nat -L  #Show ip tables
+iptables -t nat -nL
+iptables -t nat -nL | grep -i 80
+
+
+
 
 
