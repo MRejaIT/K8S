@@ -1,0 +1,20 @@
+apiVersion: v2
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: nps1
+  name: nps1
+spec:
+  ports:
+  - name: "80"
+    nodePort: 30100
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: nps1
+  type: NodePort
+status:
+  loadBalancer: {}
+  
