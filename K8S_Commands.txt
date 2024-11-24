@@ -324,6 +324,33 @@ iptables -t nat -nL | grep -i 80
 
 #High avilablity and scaleablity in Kubernetes
 #ReplicationController
+#Example
+-----------------
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: demorc1
+spec:
+  replicas: 2
+  template:
+    metadata:
+      name: pod1
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: doc1
+          image: nginx
+-------------------------------
+
+kubectl apply -f rc.yaml
+kubectl get replicationcontrollers
+kubectl get replicationcontrollers <replicationcontroller name>
+kubectl delete replicationcontrollers demorc1
+kubectl scale replicationcontrollers demorc1 --replicas 5
+kubectl edit replicationcontrollers <replication name>
+
+#Note: Limition labels, old technology.
 
 #ReplicaSet 
 
