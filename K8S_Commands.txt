@@ -82,7 +82,7 @@ spec:
   restartPolicy: Always
 status: {}
 ------------------------------
-
+ kubectl set image pod/<pod name> <container name> doc1=httpd
  kubectl exec -it multicontainer /bin/bash   #login container
  kubectl exec -it multicontainer /bin/sh     #login container
 
@@ -349,10 +349,88 @@ kubectl get replicationcontrollers <replicationcontroller name>
 kubectl delete replicationcontrollers demorc1
 kubectl scale replicationcontrollers demorc1 --replicas 5
 kubectl edit replicationcontrollers <replication name>
+kubectl explain replicationcontroller
+kubectl describe replicationcontrollers demorc1
+kubectl set image replicationcontrollers/demorc1 doc=httpd
+kubectl expose replicationcontrollers demorc1
 
-#Note: Limition labels, old technology.
+#Note: Limition labels, old technology,runnig pod not change image.
 
 #ReplicaSet 
+kubectl explain replicaset
+kubectl describe replicaset.apps demors1
+kubectl apply -f rs.yaml
+kubectl get replicaset <replicaset name>
+kubectl delete replicaset demors1
+kubectl scale replicaset demors1 --replicas 5
+kubectl edit replicaset <replication name>
+kubectl set image replicaset/demors1 doc=httpd
+kubectl expose replicaset demors1
+
+#Example
+---------------
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: demors1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      dep: cse
+      batch: sixth
+  template:
+    metadata:
+      labels:
+        dep: cse
+        batch: sixth
+    spec:
+      containers:
+        - name: doc1
+          image: nginx
+-------------------------
+
+#Note: Running change image not posssible, rollback not possible.
+
+
+
+#Deployment (automatic create replicaset)
+kubectl create deployment --image nginx --replicas 3 
+kubectl create deployment --image nginx --replicas 3 -o yaml --dry-run=client > dep.yaml
+kubectl explain deployment
+kubectl describe deployment.apps demors1
+kubectl apply -f dep.yaml
+kubectl get deployment <replicaset name>
+kubectl delete deployment demors1
+kubectl scale deployment demors1 --replicas 5
+kubectl edit deployment <replication name>
+kubectl set image deployment demors1 doc=httpd
+kubectl expose deployment demors1
+
+
+#Example
+------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demors1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      dep: cse
+      batch: sixth
+  template:
+    metadata:
+      labels:
+        dep: cse
+        batch: sixth
+    spec:
+      containers:
+        - name: doc1
+          image: nginx
+------------------------------
+
 
 
 
