@@ -189,7 +189,7 @@ initContainers:
  #type of Service
   1. ClusterIP
   2. NodePort
-  3. Loadbalancer
+  3. LoadBalancer
   4. ExternalName
 
 #ClusterIP 
@@ -212,9 +212,90 @@ kubectl create service clusterip svc1 --tcp 80 -o yaml --dry-run=clientm > svc1.
 
 
 
-#NodePort
+#NodePort (NodePorts in Kubernetes is 30,000–32,767)
+kubectl create service nodeport nps1 --tcp 80
+kubectl create service nodeport nps1 --tcp 80 -o yaml --dry-run=client > nodeports.yaml
+#Example
+----------
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: nps1
+  name: nps1
+spec:
+  ports:
+  - name: "80"
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: nps1
+  type: NodePort
+status:
+  loadBalancer: {}
+
+----------
 
 
+kubectl create service nodeport nps1 --tcp 80 --node-port 30100
+kubectl create service nodeport nps1 --tcp 80 --node-port 30100 -o yaml --dry-run=client > nodeports.yaml
+#Example
+---------
+apiVersion: v2
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: nps1
+  name: nps1
+spec:
+  ports:
+  - name: "80"
+    nodePort: 30100
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: nps1
+  type: NodePort
+status:
+  loadBalancer: {}
+-------------------
+
+#LoadBalancer
+
+
+#ExternalName
+kubectl create service externalname ext1 --external-name abc.com --tcp 80
+kubectl create service externalname ext1 --external-name abc.com --tcp 80 -o yaml --dry-run=client
+kubectl create service externalname ext1 --external-name <Ip address> --tcp 80
+kubectl create service externalname ext1 --external-name <Ip address> --tcp 80 -o yaml --dry-run=client
+
+#Example
+----------
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ext1
+  name: ext1
+spec:
+  externalName: abc.com
+  ports:
+  - name: "80"
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: ext1
+  type: ExternalName
+status:
+  loadBalancer: {}
+
+------------------------
 
 #Show Network
 iptables -t nat -L  #Show ip tables
