@@ -192,22 +192,37 @@ initContainers:
   3. Loadbalancer
   4. ExternalName
 
+#ClusterIP 
 kubectl get service #Build in service
 kubectl create service clusterip svc1 --tcp 80
 kubectl describe service <service name>
-kubectl edit service <service name>
-kubectl get service --show-labels
-kubectl edit pod <pod name>
-kubectl label pod webapp2 app=svc1
-kubectl label --overwrite pods <pod_name> key=new_value
+kubectl edit service <service name>  #Edit Label
+kubectl get service --show-labels    # Show label
+kubectl edit pod <pod name>          #Edit Pod
+kubectl label pod webapp2 app=svc1   #Set label
+kubectl label --overwrite pods <pod_name> key=new_value #overwrite label
 kubectl create service clusterip --clusterip 10.97.101.55 --tcp 81:80 svc2
 
-kubectl run pod1 --image nginx --port 80 --expose
+kubectl run pod1 --image nginx --port 80 --expose   #expose (create service and label set)
+kubectl expose pod web1 --port 80
+kubectl expose pod web1 --port 81 --target-port 80
+kubectl get service web1 -o yaml
+kubectl run web3 --image nginx --labels run=web1
+kubectl create service clusterip svc1 --tcp 80 -o yaml --dry-run=clientm > svc1.yaml
 
 
+
+#NodePort
+
+
+
+#Show Network
 iptables -t nat -L  #Show ip tables
 iptables -t nat -nL
 iptables -t nat -nL | grep -i 80
+
+
+
 
 
 
