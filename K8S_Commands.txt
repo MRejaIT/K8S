@@ -210,6 +210,25 @@ kubectl get service web1 -o yaml
 kubectl run web3 --image nginx --labels run=web1
 kubectl create service clusterip svc1 --tcp 80 -o yaml --dry-run=clientm > svc1.yaml
 
+#Example
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: svc1
+  name: svc1
+spec:
+  ports:
+  - name: "80"
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: svc1
+  type: ClusterIP
+status:
+  loadBalancer: {}
 
 
 #NodePort (NodePorts in Kubernetes is 30,000–32,767)
@@ -303,7 +322,10 @@ iptables -t nat -nL
 iptables -t nat -nL | grep -i 80
 
 
+#High avilablity and scaleablity in Kubernetes
+#ReplicationController
 
+#ReplicaSet 
 
 
 
