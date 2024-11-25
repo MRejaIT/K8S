@@ -406,6 +406,17 @@ kubectl scale deployment demors1 --replicas 5
 kubectl edit deployment <replication name>
 kubectl set image deployment demors1 doc=httpd
 kubectl expose deployment demors1
+kubectl get deployments.apps <deployment name>
+kubectl describe replicasets.apps <deployment name>
+kubectl expose deployment dep1 --port 80
+kubectl set image deploy/dep1 nginx=httpd
+kubectl rollout history deployment <deployment name>
+kubectl rollout history deployment dep1 --revision 1
+kubectl rollout undo deployment dep1
+kubectl rollout undo deployment dep1 --to-revision 1
+
+
+
 
 
 #Example
@@ -432,7 +443,63 @@ spec:
 ------------------------------
 
 
+#Scheduling pod
+kubectl get pods --namespace kube-system
+cd /etc/kubernetes/manifests/
+ls 
+mv kube-scheduler.yaml /root/
+mv kube-scheduler.yaml /etc/kubernetes/manifests/
+
+#Example
+----------
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: manual
+  name: manual
+spec:
+  nodeName: worker1
+  containers:
+  - image: nginx
+    name: manual
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+------------------------
 
 
+
+
+#Node Selector 
+kubectl get nodes --show-labels
+kubectl get nodes --show-labels worker1
+kubectl label node worker1 disk=nvme
+kubectl label node worker2 disk=ssd 
+kubectl get nodes --selector disk=nvme
+kubectl get nodes --selector disk=ssd
+
+#Example
+----------
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: nodeselector
+  name: nodeselector
+spec:
+  nodeSelector:
+    disk: nvme
+  containers:
+  - image: nginx
+    name: manual
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+------------------------
 
 
