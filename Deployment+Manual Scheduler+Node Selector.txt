@@ -1,0 +1,135 @@
+		::: Deployment ::::
+
+
+Deployment is one of the mechanisms for handling workloads (applications) in Kubernetes. It is managed by Kubernetes Deployment Controller.
+
+In Kubernetes, controllers are control loops that watch the state of your cluster, then make or request changes where needed. Each controller tries to move the current cluster state closer to the desired state.
+
+Deployment is an abstraction over ReplicaSet. Under the hood, Deployment creates a ReplicaSet which in turn creates pods on our cluster. As per the name, ReplicaSet is used for managing the replicas of our pods.
+
+
+
+In summary, Controller reads the Deployment spec, forwards the pod configuration to ReplicaSet and then it creates the pods with proper replicas.
+
+
+
+Deployement >> Replicaset >> POD 
+
+Deployment-Controller>> ReplicationController>> pod 
+
+
+dep1 >> 10 POds >> nginx 
+
+
+
+
+
+
+Rolling updates Deployment::::
+
+
+Kubernetes promises zero down time and one of the reasons behind it is Rolling Deployments. With Rolling Deployments, Kubernetes makes sure that the traffic to the pods are not interrupted when updated pods are being deployed.
+
+
+Rollback Deployment:::
+
+Rollback Deployment means, going back to the previous instance of the deployment if there is some issue with the current deployment.
+
+
+
+
+
+
+
+Create Deployment: 
+
+
+	#kubectl create deployment dep1 --image nginx --replicas 5
+	#kubectl get deployments
+	#kubectl get rs
+	#kubectl get pods
+	#kubectl describe deploy dep1
+
+Scale Deployment: 
+
+	#kubectl scale deploy dep1 --replicas=2
+
+Rolling Update Deployment:
+
+	#kubectl set image deploy dep1 nginx=nginx:stable
+	#kubectl get pods
+	#kubectl set image deploy dep1 nginx=httpd
+
+Rollback Deployment: 
+
+	#kubectl get rs
+	#kubectl rollout history deploy dep1 
+	#kubectl rollout history deploy dep1 --revision=1
+	#kubectl rollout undo deploy dep1
+	#kubectl rollout undo deploy dep1 --to-revision=<Revision-no>
+
+	
+
+
+
+
+
+
+
+		::::Scheduling POD::::
+
+
+		1. Manual Scheduling >> nodeName 
+
+		2. Node Selector >> nodeSelector using node label
+
+
+		dbpod >> i/o 
+				worker1 	>> disk=nvme
+				worker2		>> disk=ssd
+
+
+		dbpod >> nvme >> 
+			nodeSelector:
+				disk: nvme
+
+
+		1. label the nodes
+
+			- kubectl label node kworker1 disk=nvme
+			- kubectl label node kworker2 disk=ssd 
+
+
+
+
+ >> Affinity
+
+		>> DNS >> Primary DNS		VM1 >> hypervisor1 
+			  Secondary DNS		VM2 >> hypervisor1
+
+			WEB >> DB >> WEB +DB >> Hypervisor1 >> 
+
+
+
+
+ 
+
+ 
+
+		3. Node Affinity
+				- Required node Affinity
+				- Preferred Node Affinity
+	
+			
+				affinity:
+                                 nodeAffinity: 
+				   requiredDuringScheduilingIgnoredDuringExecution:
+ 				    nodeSelectorTerms:
+					- matchExpressions: 
+ 					   - key:
+					     operator: 
+					     values: 
+
+		4. Taints and Tolerations 
+			 
+		
