@@ -1,0 +1,71 @@
+			- Affinity and Antiaffinity
+
+Affinity:			nodeAffinity
+				podAffinity
+
+
+			
+			:::::::nodeAffinity:::::::::::
+
+         You can indicate that a rule is soft or preferred, so that the scheduler still 
+         schedules the Pod even if it can't find a matching node.
+		There are two types of node affinity:
+
+		1. requiredDuringSchedulingIgnoredDuringExecution:
+		2. preferredDuringSchedulingIgnoredDuringExecution: 
+
+
+		requiredDuringSchedulingIgnoredDuringExecution:
+
+  The scheduler can't schedule the Pod unless the rule is met. 
+
+  Like nodeSelector, but with a more expressive syntax.
+
+
+		preferredDuringSchedulingIgnoredDuringExecution: 
+
+The scheduler tries to find a node that meets the rule. 
+
+If a matching node is not available, the scheduler still schedules the Pod.
+
+			::::podAffinity:::(Inter-pod affinity/anti-affinity)
+
+         You can constrain a Pod using labels on other Pods running on the node (or other topological domain), 
+         instead of just node labels, which allows you to define rules for which Pods can be co-located on a node.
+
+        Inter-pod affinity/anti-affinity allows you to constrain Pods against labels on other Pods.
+
+
+
+
+ 
+
+
+			LAB: Recap -nodeName
+			     Recap - nodeSelector
+			     New: 
+			       affinity >> nodeAffinity >> required
+
+- Want to schedule pod in kworker1  
+- Want to schedule pod in kworker1 or kworker2
+ 
+
+
+
+
+
+			       affinity >> nodeAffinity >> preferred 
+- Want to schedule pod in kworker1 if not possible then any workernodes in cluster .. 
+ 
+- Want to schedule pod in kworker1 if not possible then kworker2 - if both option is not available then any nodes in cluster
+
+
+			 
+
+
+ 
+
+
+##############################################################################
+
+
