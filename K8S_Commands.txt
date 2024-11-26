@@ -353,6 +353,8 @@ kubectl explain replicationcontroller
 kubectl describe replicationcontrollers demorc1
 kubectl set image replicationcontrollers/demorc1 doc=httpd
 kubectl expose replicationcontrollers demorc1
+kubectl label <node or pod name> worker1 size- (;abel key-)
+
 
 #Note: Limition labels, old technology,runnig pod not change image.
 
@@ -366,6 +368,8 @@ kubectl scale replicaset demors1 --replicas 5
 kubectl edit replicaset <replication name>
 kubectl set image replicaset/demors1 doc=httpd
 kubectl expose replicaset demors1
+kubectl label <node or pod name> worker1 size- (;abel key-)
+
 
 #Example
 ---------------
@@ -414,6 +418,7 @@ kubectl rollout history deployment <deployment name>
 kubectl rollout history deployment dep1 --revision 1
 kubectl rollout undo deployment dep1
 kubectl rollout undo deployment dep1 --to-revision 1
+kubectl label <node or pod name> worker1 size- (;abel key-)
 
 
 
@@ -449,6 +454,8 @@ cd /etc/kubernetes/manifests/
 ls 
 mv kube-scheduler.yaml /root/
 mv kube-scheduler.yaml /etc/kubernetes/manifests/
+kubectl label <node or pod name> worker1 size- (;abel key-)
+
 
 #Example
 ----------
@@ -480,6 +487,7 @@ kubectl label node worker1 disk=nvme
 kubectl label node worker2 disk=ssd 
 kubectl get nodes --selector disk=nvme
 kubectl get nodes --selector disk=ssd
+kubectl label <node or pod name> worker1 size- (;abel key-)
 
 #Example
 ----------
@@ -502,6 +510,67 @@ spec:
 status: {}
 ------------------------
 
+
+#Affinity
+kubectl label <node or pod name> worker1 size- (;abel key-)
+
+#Example:nodeAffinityRequired
+-----------------------------
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: web
+  name: web
+spec:
+  affinity:
+   nodeAffinity:
+     requiredDuringSchedulingIgnoredDuringExecution:
+       nodeSelectorTerms:
+         - matchExpressions:
+             - key: size
+               operator: In   #operator type (In, NotIn, Exists, DoesNotExist, Gt, Lt)
+               values:
+                - small
+                - medium
+  containers:
+  - image: nginx
+    name: web 
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+-------------------------------
+
+#Example:nodeAffinityPreferred
+--------------------------------
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: web
+  name: web
+spec:
+  affinity:
+   nodeAffinity:
+     preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 1
+        preference:
+          matchExpressions:
+          - key: size
+            operator: In
+            values:
+            - large 
+  containers:
+  - image: nginx
+    name: web 
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+------------------------------
 
 
 
