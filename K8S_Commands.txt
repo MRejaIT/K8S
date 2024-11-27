@@ -573,6 +573,74 @@ status: {}
 ------------------------------
 
 
+#Pod Affinity
+
+#Example
+----------
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: web
+  name: web
+spec:
+  affinity:
+    podAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: security
+            operator: In
+            values:
+            - S1
+        topologyKey: kubernetes.io/hostname 
+  containers:
+  - image: nginx
+    name: web 
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+---------------------------------
+
+#Taint and tolerations
+kubectl describe nodes master | grep -i taint -C 5
+kubectl describe nodes worker1 | grep -i taint
+kubectl taint node master node-role.kubernetes.io/control-plane:NoSchedule-
+kubectl taint node master node-role.kubernetes.io/control-plane:NoSchedule
+kubectl taint node master node-role.kubernetes.io/control-plane:NoExcute
+kubectl taint node master node-role.kubernetes.io/control-plane:PreferNoSchedule
+kubectl run pod1 --image nginx -o yaml --dry-run=client > tolerations.yaml
+vi tolerations.yaml
+kubectl taint node worker1 dep=cse:NoSchedule
+
+
+#Example
+-------------
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: pod1
+  name: pod1
+spec:
+  tolerations:
+    - key: deb
+      operator: Eual
+      value: cse
+      effect: NoSchedule
+  containers:
+  - image: nginx
+    name: pod1
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+------------------------------
+
+
 
 
 
