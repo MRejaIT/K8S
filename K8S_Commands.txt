@@ -641,6 +641,95 @@ status: {}
 ------------------------------
 
 
+#StaticPod 
+kubectl run staticpod --image nginx -o yaml --dry-run=client > staticpod.yaml
+scp staticpod.yaml azuser@worker1:
+cd /etc/kubernetes/manifests
+mv /root/staticpod.yaml ./
+kubectl exec -it staticpod-worker1 -- /bin/bash
+ps -aux | grep -i kubelet 
+vi /var/lib/kubelet/config.yaml
+mv /etc/kubernetes/manifests kube-Scheduler.yaml /opt/
+mv /opt/kube-scheduler.yaml /etc/kubernetes/manifests/
+
+
+#DaemonSet
+kubectl get ns
+kubectl explain daemonsets.apps
+kubectl api-resources | grep -i daemon
+kubectl get ds
+kubectl get daemonsets.apps
+kubectl get daemonsets.apps -n kube-system
+kubectl edit daemonsets.apps -n kube-system
+kubectl get rs -n kube-system kube-proxy
+kubectl apply -f daemonsert.yaml
+kubectl delete daemonsets.apps daemonset
+
+
+#Example
+--------------
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  creationTimestamp: null
+  labels:
+    app: daemonset
+  name: daemonset
+spec:
+  selector:
+    matchLabels:
+      app: daemonset
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: daemonset
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+        resources: {}
+----------------------------------
+
+
+#metrics server (Note: Update 15 se maximum)
+kubectl top node
+kubectl top pod 
+wget https://raw.githubusercontent.com/pythianarora/total-practice/master/sample-kubernetes-code/metrics-server.yaml
+kubectl get pod --namespace kube-system
+kubectl get ns 
+kubectl apply -f metrics-server.yaml
+kubectl get pods -A
+kubectl get pods --namespace kube-system
+kubectl top node
+kubectl top node <node name>
+kubectl top pod 
+kubectl top pod <pod name>
+kubectl top node --sort-by cpu
+kubectl top node --sort-by memory
+kubectl top pod --selector pod=pod 
+kubectl top pod --sort-by cpu > /tmp/cpu.list
+
+
+#Worker node work load 
+dd if=/dev/zero of=/dev/null&
+dd if=/dev/zero of=/dev/null bs=1G&  #backround run
+dd if=/dev/zero of=/dev/null bs=1G
+jobs
+fg 1
+fg 2
+
+
+#Horizantail scaling (HA)
+nproc
+lscpu
+cat /proc/cpuinfo
+kubectl run pod1 --image nginx
+kubectl describe pod pod1
+kubectl exec -it pod1 -- /bin/bash
+
+
+
 
 
 
