@@ -756,6 +756,34 @@ status: {}
 ----------------------------
 
 
+
+#LimitRange
+kubectl explain limitrange 
+kubectl apply -f default-cpu-memory-limit.yaml
+kubectl get limitranges cpu-limit-range
+kubectl describe limitranges cpu-limit-range 
+kubectl apply -f default-cpu-memory-limit.yaml --namespace <namespace name>
+kubectl get limitranges --namespaces <namespace nam>
+
+
+#Example
+---------------
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: cpu-limit-range
+spec:
+  limits:
+  - default:
+      cpu: 1
+      memory: 200Mi
+    defaultRequest:
+      cpu: 0.5
+      memory: 100Mi
+    type: Container
+---------------------
+
+
 #Horizantail scaling (HA)
 
 
