@@ -720,13 +720,44 @@ fg 1
 fg 2
 
 
-#Horizantail scaling (HA)
+#Limits 
 nproc
 lscpu
 cat /proc/cpuinfo
 kubectl run pod1 --image nginx
 kubectl describe pod pod1
 kubectl exec -it pod1 -- /bin/bash
+kubectl run pod2 --image nginx -o yaml --dry-run=client > limit.yaml
+
+
+#Example
+------------------
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: pod2
+  name: pod2
+spec:
+  containers:
+  - image: nginx
+    name: pod2
+    resources:
+     requests:
+       cpu: 256m
+       memory: 256Mi
+     limits:
+       cpu: 500m
+       memory: 500Mi
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+----------------------------
+
+
+#Horizantail scaling (HA)
+
 
 
 
