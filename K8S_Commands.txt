@@ -757,14 +757,14 @@ status: {}
 
 
 
-#LimitRange
+#LimitRange  (pod)
 kubectl explain limitrange 
 kubectl apply -f default-cpu-memory-limit.yaml
 kubectl get limitranges cpu-limit-range
 kubectl describe limitranges cpu-limit-range 
 kubectl apply -f default-cpu-memory-limit.yaml --namespace <namespace name>
 kubectl get limitranges --namespaces <namespace nam>
-
+kubectl get limitranges
 
 #Example
 ---------------
@@ -784,7 +784,11 @@ spec:
 ---------------------
 
 
-#Horizantail scaling (HA)
+#LimitRange  (namespace) resources quotas
+kubectl get resourcequotas
+
+
+#Horizantail pod scaling (HPA)
 
 
 
