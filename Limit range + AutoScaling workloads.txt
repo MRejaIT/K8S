@@ -1,0 +1,112 @@
+		- limitRanges >>
+			
+		 - How much cpu and Memory can consume each container ?
+		 - There are two types of cpu and memory resources
+		
+			1. requests
+			2. limits
+
+
+		 - By Default no there is no limit of cpu and memory of each pod.
+
+		 -  We can set requests of cpu and memory or limits of cpu and memory in resource Defination File..
+
+		 - If we want to set default limits/requests for pod - then we can create default-limit-range 
+		 - kubectl get limitranges
+		 - vi default-cpu-memory-limit-range.yaml
+
+##############
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: cpu-limit-range
+spec:
+  limits:
+  - default:
+      cpu: 1
+      memory: 200Mi
+    defaultRequest:
+      cpu: 0.5
+      memory: 100Mi
+    type: Container
+################### 
+
+		#kubectl apply -f default-cpu-memory-limit-range.yaml 
+		or 
+		#kubectl apply -f default-cpu-memory-limit-range.yaml --namespace demo
+
+
+
+
+		- ResourceQuota >> 
+
+
+	- We can limit pods,cpu and memory for a specific namespace..
+
+	- By Default we can create as much as kubernetes is supporing..
+
+	- we can bind the limit by creating resource Quota.
+	#kubectl get resourcequota 
+
+	#vi default-resource-qouta-pod-cpu-memory.yaml
+
+####################
+apiVersion: v1
+kind: ResourceQuota
+metadata: 
+ name: pod-quota-demo
+spec:
+  hard:
+   pods: "10"
+   memory: "2Gi"
+   cpu: "2"
+##################
+
+		#kubectl apply -f default-resource-qouta-pod-cpu-memory.yaml                                                                                     
+		#we can apply in sepcific namespace also 
+
+		#kubectl apply -f default-resource-qouta-pod-cpu-memory.yaml --namespace demo
+                                                                                     
+
+
+		Autoscaling Workloads
+
+With autoscaling, you can automatically update your workloads in one way or another.
+This allows your cluster to react to changes in resource demand more elastically and efficiently.
+
+	
+		Horizontal scaling: Running multiple instances of your app
+
+		Vertical scaling: Resizing CPU and memory resources assigned to containers
+
+
+
+
+		- Horizontal Pod AutoScaler ( hpa) 
+		- Vertical Pod AutoScaler (vpa)
+		- Node AutoScaler
+
+LAB-HPA: 
+
+	#kubectl create deployment dep1 --image nginx:alpine
+	#kubectl get pods
+	#kubectl autoscale deployment dep1 --max 3 --min 1 --cpu-percentage=60
+	#kubectl get hpa
+
+
+		
+		>>> Deploy Mysql Database >>> 
+
+
+	 >> Ephemeral Volumes
+	 >> PersistentVolumes
+
+
+
+
+
+
+	
+		
+
+
