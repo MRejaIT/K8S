@@ -882,7 +882,7 @@ spec:
 -------------------------------
 
 kubectl run db1 --image mysql --env MYSQL_ROOT_PASSWORD=cka321
-kubectl run db2 --image mysql MYSQL_ROOT_PASSWORD=cka321 -o yaml --dry-run=client > db2.yaml
+kubectl run db2 --image mysql --eve MYSQL_ROOT_PASSWORD=cka321 -o yaml --dry-run=client > db2.yaml
 
 #Example
 ----------------
