@@ -786,13 +786,124 @@ spec:
 
 #LimitRange  (namespace) resources quotas
 kubectl get resourcequotas
+kubectl apply -f limitrange.yaml
+kubectl get limitranges
+kubectl describe limitranges <limitrange name>
+kubectl describe pod pod1 | grep -i limit -C 10
+kubectl exec -it pod1 -- /bin/sh
+dd if=/dev/zero of=/dev/null
+kubectl delete pod pod1 --force --grace-period=0
+
+
+#Example
+----------------
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: cpu-resource-constraint
+spec:
+  limits:
+  - default: # this section defines default limits
+      cpu: 200m
+    defaultRequest: # this section defines default requests
+      cpu: 200m
+    max: # max and min define the limit range
+      cpu: "200m"
+    min:
+      cpu: 200m
+    type: Container
+--------------------------------------
 
 
 #Horizantail pod scaling (HPA)
+kubectl create deployment dep1 --image nginx
+kubectl exec -it pods/dep1-64cd8df7fd-8hf6m -- /bin/sh
+dd if=/dev/zero of=/dev/null
+kubectl describe pods dep1-64cd8df7fd-8hf6m | grep -i cpu
+kubectl api-resources | grep  hpa
+kubectl explain hpa
+kubectl get horizontalpodautoscalers.autoscaling
+kubectl get hpa 
+kubectl autoscale deployment dep1 --max 3 --min 1 --cpu-percent 70
+kubectl describe hpa 
 
 
+#Example (HPA memory)
+-----------------
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  creationTimestamp: "2024-12-01T04:15:38Z"
+  name: dep1
+  namespace: default
+spec:
+  maxReplicas: 3
+  metrics:
+  - resource:
+      name: memory
+      target:
+        averageUtilization: 80
+        type: Utilization
+    type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: dep1
+--------------------------------
 
+#Environment Variable
+whereis ls 
+export name=reja
+unset name
+kubectl exec -it pod1 -- env 
+kubectl run pod1 --image nginx --env batch=cka3
+kubectl run pod1 --image nginx --env batch=cka3 --env name=reja
+kubectl run pod1 --image nginx --env batch=cka3 --env name=reja -o yaml --dry-run=client > env.yaml
 
+#Example
+------------------
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: pod1
+  name: pod1
+spec:
+  containers:
+  - env:
+    - name: batch
+      value: cka3
+    - name: name
+      value: reja
+    image: nginx
+    name: pod1
+-------------------------------
+
+kubectl run db1 --image mysql --env MYSQL_ROOT_PASSWORD=cka321
+kubectl run db2 --image mysql MYSQL_ROOT_PASSWORD=cka321 -o yaml --dry-run=client > db2.yaml
+
+#Example
+----------------
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: db2
+  name: db2
+spec:
+  containers:
+  - args:
+    - MYSQL_ROOT_PASSWORD=cka321
+    image: mysql
+    name: db2
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+-----------------------
 
 
 
