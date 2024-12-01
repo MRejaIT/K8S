@@ -905,5 +905,71 @@ spec:
 status: {}
 -----------------------
 
+#ConfigMap
+kubectl get configmaps
+kubectl create configmap dbconfig1 --from-literal MYSQL_ROOT_PASSWORD=redhat321
+kubectl describe configmaps dbconfig1
+
+#Example
+---------------
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+   run: db1
+   name:  db1
+spec:
+  containers:
+  - name: db1
+    image: mysql
+    env:
+    - name: MYSQL_ROOT_PASSWORD
+      valueFrom:
+        configMapKeyRef:
+          name: dbconfig1
+          key: MYSQL_ROOT_PASSWORD
+-------------------------------------
+
+kubectl describe pods db1 | grep -i configmap
+kubectl edit configmaps dbconfig1
+kubectl logs pods/db1
+kubectl events -w 
+kubectl create configmap demo1 --from-literal name=reja --from-literal roll=6024 --from-literal capital=dhaka
+
+
+#Secrets 
+kubectl get secrets
+kubectl create secret generic dbsec1 --from-literal mypass=redhat321
+kubectl get secrets dbsec1
+kubectl describe secrets dbsec1
+kubectl get secrets dbsec1 -o yaml 
+echo <value> | base64 -d 
+kubectl describe pods db1 | grep -i secret 
+kubectl describe pods db1 | grep -i secret -C 5
+
+#Example
+-----------------
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+   run: db1
+   name:  db1
+spec:
+  containers:
+  - name: db1
+    image: mysql
+    env:
+    - name: MYSQL_ROOT_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: dbconfig1
+          key: mypass 
+----------------------------------------
+
+#Volumes 
+
 
 
