@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: web1
+  name: web1
+spec:
+  volumes:
+    - name: webvol1
+      hostPath:
+        path: /mnt/webhost
+        type: DirectoryOrCreate
+  containers:
+  - image: nginx
+    name: web1
+    volumeMounts:
+      - name: webvol1
+        mountPath: "/usr/share/nginx/html"

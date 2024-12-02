@@ -973,7 +973,7 @@ spec:
    Ephemeral
    Persistent
 
-#Ephemeral
+#Ephemeral volumes
    emptyDir
 
 /var/lib/kubelet  #Storage location
@@ -1012,6 +1012,85 @@ spec:
        - name: cache-volume
          mountPath: /cache
 -----------------------------------
+
+
+#Persistent volumes
+  hostpath
+  nfs
+
+#hostname volumes
+kubectl run web1 --image nginx -o yaml --dry-run=client > hostpath.yaml
+kubectl apply -f hostpath.yaml
+kubectl describe pod webvol1 | grep vol 
+
+#Example
+--------------
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: web1
+  name: web1
+spec:
+  volumes:
+    - name: webvol1
+      hostPath:
+        path: /mnt/webhost
+        type: DirectoryOrCreate
+  containers:
+  - image: nginx
+    name: web1
+    volumeMounts:
+      - name: webvol1
+        mountPath: "/usr/share/nginx/html"
+-----------------------------------------------
+
+kubectl create deployment demo --image nginx -o yaml --dry-run=client > demodep.yaml
+kubectl apply -f demodep.yaml
+echo worker1 > index.html
+kubectl scale deployment demo --replicas 10
+kubectl expose deployment demo --port 80
+kubectl get service
+
+
+#Example
+-----------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: demo
+  name: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: demo
+    spec:
+      volumes:
+        - name: vol1
+          hostPath:
+            path: "/mnt/webhost"
+            type: DirectoryOrCreate
+      containers:
+      - image: nginx
+        name: nginx
+        volumeMounts:
+          - name: vol1
+            mountPath: "/usr/share/nginx/html"
+            readOnly: true
+-----------------------------------------------------------
+
+
+#nfs Volumes
 
 
 
