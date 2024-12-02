@@ -1198,6 +1198,10 @@ spec:
 
 
 #Persistent Volumes (PV)
+kubectl get pv
+kubectl explain pv
+kubectl get persistentvolumeclaims
+kubectl get pvc 
 
 
 
