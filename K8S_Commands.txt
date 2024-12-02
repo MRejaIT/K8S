@@ -970,6 +970,48 @@ spec:
 ----------------------------------------
 
 #Volumes 
+   Ephemeral
+   Persistent
+
+#Ephemeral
+   emptyDir
+
+/var/lib/kubelet  #Storage location
+kubectl exec -it multipod -c doc1 -- df -HT
+kubectl exec -it multipod -c doc1 -- df -hT
+kubectl exec -it pods/multipod --container pod1 -- ls -l /shared
+kubectl exec -it pods/multipod --container pod2 -- touch /data/bata.txt
+kubectl exec -it pods/multipod --container pod1 -- df -HT
+kubectl describe pod multipod | more volume
+
+
+#Example (single pod)
+-------------------
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: pod1
+  name: pod1
+spec:
+  volumes: 
+    - name: cache-volume
+      emptyDir:
+        sizeLimit: 1Gi
+
+  containers:
+  - image: nginx
+    name: pod1
+    resources: 
+      limits: 
+        memory: 256Mi
+        
+
+    volumeMounts: 
+       - name: cache-volume
+         mountPath: /cache
+-----------------------------------
 
 
 
