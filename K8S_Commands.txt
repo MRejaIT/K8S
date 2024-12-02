@@ -1090,7 +1090,119 @@ spec:
 -----------------------------------------------------------
 
 
-#nfs Volumes
+#nfs Volumes 
+ apt-get install nfs-server 
+ share rw worker node 
+ mkdir /shared
+ chown 65534 shared/
+ vi /etc/exports
+ /shared 
+ restart/start/enable server
+ firewall allow port 2049 tcp+ucp 
+
+ cd /etc
+ mkdir /shared
+ chown 65534 /shared/
+ ls -ld /shared/
+ vi /etc/exports 
+      /shared             192.68.91.0/24(rw,sync)
+
+ systemctl restart nfs-server.service
+ systemctl enable nfs-server
+ systemctl status nfs-server
+ ufw status
+ exportfs 
+ cd /shared
+ mkdir nfsvol1
+ ls -l 
+ chown 65534 nfsvol1/
+ ls 
+ cat /etc/exports 
+
+
+ #worker node (nfs client machine)
+ apt-get install nfs-common
+ mount -t nfs <nfs server ip>:/shared/nfsvol1 /mnt
+ mount -t nfs 172.16.0.8:/shared/nfsvol1 /mnt
+ cd /mnt 
+ ls
+ df -hT 
+ umount /mnt 
+ 
+ kubectl apply -f nfs.yaml
+ kubectl describe pod/nfsweb1
+ kubectl replace -f nfs.yaml --force
+
+
+ #Example
+ ------------------
+ apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: nfsweb1
+  name: nfsweb1
+spec:
+  volumes:
+    - name: webvol1
+      nfs:
+       server: 192.168.91.97
+       path: /shared/nfsvol1
+  containers:
+  - image: nginx
+    name: web1
+    volumeMounts:
+      - name: webvol1
+        mountPath: "/usr/share/nginx/html"
+--------------------------------------------
+
+
+kubectl apply -f nfs-dep.yaml
+kubectl scale deployment demo --replicas 10
+
+#Example nfs deployment
+----------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: demo
+  name: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: demo
+    spec:
+      volumes:
+        - name: vol1
+          nfs:
+           server: 192.168.91.97
+           path: "/shared/nfsvol1"
+      containers:
+      - image: nginx
+        name: nginx
+        volumeMounts:
+          - name: vol1
+            mountPath: "/usr/share/nginx/html"
+---------------------------------------------------------
+
+
+
+#Persistent Volumes (PV)
+
+
+
+
+
 
 
 
