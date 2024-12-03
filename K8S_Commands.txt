@@ -1269,6 +1269,83 @@ spec:
           name: dol1
 ----------------------------------------
 
+#ReclaimPolicy
+ - Retain 
+ - Recycle
+ - Delete
+
+
+#Network Policy 
+ -install calico 
+
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/tigera-operator.yaml
+or
+wget https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/tigera-operator.yaml
+kubectl apply -f tigera-operator.yaml
+
+curl https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/custom-resources.yaml -O
+vi custom-resources.yaml  #Change cidir ip range 
+kubectl create -f custom-resources.yaml
+
+kubectl get pod --namespace tigera-operator
+kubectl get pods -A 
+kubectl get pods -A | grep -i calico
+
+
+kubectl create namespace frontend
+kubectl create namespace backend
+kubectl run --namespace frontend web1 --image nginx
+kubectl run --namespace backend db1 --image nginx
+kubectl get pod --namespace frontend
+kubectl get pod --namespace backend
+kubectl --namespace frontend exec -it web1 -- /bin/bash
+kubectl get networkpolicies
+kubectl get netpol --namespace backend
+kubectl describe netpol --namespace backend default-deny-ingress
+
+
+#Example
+-----------------------
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: test-network-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      role: db
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - ipBlock:
+        cidr: 172.17.0.0/16
+        except:
+        - 172.17.1.0/24
+    - namespaceSelector:
+        matchLabels:
+          project: myproject
+    - podSelector:
+        matchLabels:
+          role: frontend
+    ports:
+    - protocol: TCP
+      port: 6379
+  egress:
+  - to:
+    - ipBlock:
+        cidr: 10.0.0.0/24
+    ports:
+    - protocol: TCP
+      port: 5978
+-------------------------------------
+
+
+
+
+
 
 
 
