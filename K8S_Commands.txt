@@ -1343,6 +1343,104 @@ spec:
 -------------------------------------
 
 
+#etcd database backup nad restore 
+cd /etc/kubernetes/manifests/
+ls 
+vi etcd.yaml
+
+
+#BackUp 
+apt-get install etcd-client -y 
+etcdctl
+mkdir /backup 
+ETCDCTL_API=3 etcdctl --endpoints 10.2.0.9:2379 --cert=/etc/kubernetes/pki/etcd/server.crt --key=/etc/kubernetes/pki/etcd/server.key --cacert=/etc/kubernetes/pki/etcd/ca.crt snapshot save /backup/etcd-snapshot.db
+etcdctl snapshot status /backup/etcd-snapshot.db
+etcdctl snapshot status /backup/etcd-snapshot.db -w table 
+etcdctl snapshot status /backup/etcd-snapshot.db -w json
+etcdctl snapshot status /backup/etcd-snapshot.db -w --help 
+
+
+#Restore 
+cd /backup
+etcdctl snapshot restore etcd-snapshot.db --data-dir /var/lib/etcd-resore1
+ls
+cd /etc/kubernetes/manifests/
+ls
+vi etcd.yaml
+      -hostPath:
+        path: /var/lib/etcd-restore1
+
+crictl ps
+crictl ps | grep etcd
+
+
+#Client Node
+apt-get install kubectl
+kubectl version
+
+  #login master noide 
+  scp /etc/kubernetes/admin.conf root@worker2:
+
+mkdir .kube
+ls
+mv admin.conf .kube/
+vi .bashrc
+    export KUBECONFIG=/root/.kube/admin.conf
+    source <(kubectl completion bash)
+
+source .bashrc
+
+
+#Create user in kubernetes
+
+    openssl genrsa -out user25.key 2048
+    openssl req -new -key user25.key -out user25.csr -subj "/CN=user25"
+    openssl x509 -req -in user25.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -CAcreateserial -out user25.crt -days 10000
+   
+bash users-create-in-k8s.txt
+ls
+cat user25.crt 
+scp user25.crt root@worker2:
+scp user25.key root@worker2:
+kubectl config view 
+kubectl config delete-user user25 
+kubectl config get-contexts
+kubectl config set-credentials user25 --client-certificate /root/user25.crt --client-key /root/user25.key --embed-certs=true
+
+kubectl config set-context user25 --cluster kubernetes --user=user25 --namespace=default
+kubectl config get-contexts
+kubectl config use-context user25
+kubectl get pods
+
+#Role, RoleBinding, ClusterRole, ClusterRoleBinding
+
+  - Role  
+  kubectl get role 
+  kubectl get rolebinding
+  kubectl create role pod-reader --resource=pods --verb=list,get,watch
+  kubectl get role
+  kubectl describe role pod-reader
+  kubectl edit role pod-reader
+
+  - RoleBinding
+  kubectl create rolebinding pod-reader-rolebinding --role pod-reader --user user25
+  kubectl describe rolebinding
+  
+  kubectl auth can-i create pod --user user25   #Show permission
+  kubectl auth can-i list pods --user user25
+  
+  kubectl config set-content user25 --cluster kubernetes --username user25 --namespace default
+  kubectl config get-contexts
+  kubectl config use-context user 25
+
+
+  - ClusterRole
+  kubectl create clusterrole namespace-writer --resource=namespace --verb=create
+  
+
+  - ClusterRoleBinding
+  kubectl create clusterrolebinding namespace-writer-clusterrole-binding --clusterrole namespace-writer --user user25
+
 
 
 
