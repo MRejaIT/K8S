@@ -1202,9 +1202,72 @@ kubectl get pv
 kubectl explain pv
 kubectl get persistentvolumeclaims
 kubectl get pvc 
+kubectl apply -f pv.yaml
+kubectl describe pv pv1
 
 
+#Example
+-------------------
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv1
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---------------------------
 
+#PersistentVolumeClaim volume (PVC)
+kubectl get pvc
+kubectl get persistentvolumeclaims
+kubectl apply -f pvc.yaml
+
+
+#Example
+-----------------
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc1
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+----------------------------
+
+# PVC Pod 
+kubectl apply -f pv-pod.yaml
+kubectl describe pod pv-pod
+
+
+#Example
+------------------------
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pv-pod
+spec:
+  volumes:
+    - name: dol1
+      persistentVolumeClaim:
+        claimName: pvc1
+  containers:
+    - name: pv-pod
+      image: nginx
+      volumeMounts:
+        - mountPath: "/usr/share/nginx/html"
+          name: dol1
+----------------------------------------
 
 
 
