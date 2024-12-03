@@ -1,3 +1,5 @@
 **KUBERNETES CLUSTER**
 	
- - Cluster
+ - K8S Cluster
+ - YAML File
+ - Commands
