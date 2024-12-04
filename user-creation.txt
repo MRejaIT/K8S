@@ -1,0 +1,3 @@
+openssl genrsa -out user25.key 2048
+openssl req -new -key user25.key -out user25.csr -subj "/CN=user25"
+openssl x509 -req -in user25.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -CAcreateserial -out user25.crt -days 10000
