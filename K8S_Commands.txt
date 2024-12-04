@@ -1436,7 +1436,7 @@ kubectl get pods
 
   - ClusterRole
   kubectl create clusterrole namespace-writer --resource=namespace --verb=create
-  
+  kubectl edit clusterrole namespace-writer
 
   - ClusterRoleBinding
   kubectl create clusterrolebinding namespace-writer-clusterrole-binding --clusterrole namespace-writer --user user25
