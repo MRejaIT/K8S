@@ -1,0 +1,20 @@
+apt-get install haproxy -y
+
+cat <<pavel > /etc/haproxy/haproxy.cfg
+frontend kubernetes
+    bind *:6443
+    option tcplog
+    mode tcp
+    default_backend kubernetes-masters
+
+backend kubernetes-masters
+    mode tcp
+    balance roundrobin
+    option tcp-check
+    server master1 192.168.91.71:6443 check
+    server master2 192.168.91.72:6443 check
+    server master3 192.168.91.73:6443 check
+pavel
+
+systemctl restart haproxy
+systemctl enable haproxy
