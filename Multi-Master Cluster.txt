@@ -1,3 +1,5 @@
+#Configuration Load Balancer (HA Proxy)
+bash haproxy.txt
 Install HA Proxy in Proxy Node
 -----------------------------------
 apt-get install haproxy -y
@@ -13,9 +15,9 @@ backend kubernetes-masters
     mode tcp
     balance roundrobin
     option tcp-check
-    server K8SMater1 10.0.0.6:6443 check
-    server K8SMater2 10.0.0.7:6443 check
-    server K8SMater3 10.0.0.8:6443 check
+    server kmaster1 172.16.0.6:6443 check
+    server kmaster2 172.16.0.7:6443 check
+    server kmaster3 172.16.0.8:6443 check
 azuser
 
 systemctl restart haproxy
@@ -56,6 +58,7 @@ sudo systemctl enable docker
 sudo systemctl status docker
 sudo systemctl start docker
 
+
 #check version command
 docker --version
 
@@ -69,7 +72,7 @@ echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.
 apt-get update
 
 #Step 3: Install Kubernetes Tools
-apt-get install kubeadm kubelet kubectl
+apt-get install kubeadm kubelet kubectl -y 
 
 #Check Version
 kubeadm version
@@ -77,5 +80,257 @@ kubectl version
 kubelet --version
 dpkg -l | grep kube
 
+
+#Network
+lsmod |grep overlay
+lsmod |grep br_netfilter
+cd /etc/modules-load.d/
+vi containerd.conf     
+OR
+vi /etc/modules-load.d/containerd.conf
+		# Add the following two lines to the file:
+		overlay
+		br_netfilter
+
+cat /etc/modules-load.d/containerd.conf
+modprobe overlay
+modprobe br_netfilter
+
+cat /proc/sys/net/ipv4/ip_forward
+
+cd /etc/sysctl.d/
+vi 10-k8s.conf    
+OR
+vi /etc/sysctl.d/10-k8s.conf
+	#Add the following lines to the file:
+		net.bridge.bridge-nf-call-ip6tables = 1
+		net.bridge.bridge-nf-call-iptables = 1
+		net.ipv4.ip_forward = 1
+
+#Reload the configuration by typing:
+sysctl --system
+
+#Initialize Kubernetes on Master Node
+vi /etc/default/kubelet
+			
+			#Add the following line to the file:
+			KUBELET_EXTRA_ARGS="--cgroup-driver=cgroupfs"
+			
+cat /etc/default/kubelet
+systemctl daemon-reload && systemctl restart kubelet
+
+
 #Kubernetes init
-kubeadm init --control-plane-endpoint "192.168.91.70:6443" --upload-certs --pod-network-cidr=10.244.0.0/16
+kubeadm init --control-plane-endpoint "172.16.0.5:6443" --upload-certs --pod-network-cidr=10.244.0.0/16
+
+
+#Error show then run command
+
+cd /etc/containerd/
+rm -fr config.toml
+systemctl restart containerd.service
+systemctl status containerd.service
+
+
+kubectl get nodes
+export KUBECONFIG=/etc/kubernetes/admin.conf
+kubectl get nodes
+kubectl get nodes -o wide
+env | grep -i kube
+
+#root directory
+cd
+vi .bashrc
+	export KUBECONFIG=/etc/kubernetes/admin.conf
+kubectl get nodes
+source .bashrc
+kubectl get nodes
+kubectl get nodes -o wide
+env | grep -i kube
+
+
+kubectl get pods -A
+
+
+#Download and apply calico network plugins 
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/tigera-operator.yaml
+curl https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/custom-resources.yaml -O
+vi custom-resources.yaml
+kubectl create -f custom-resources.yaml
+cat custom-resources.yaml
+cat custom-resources.yaml | grep -i network
+kubectl apply -f custom-resources.yaml
+kubectl get pods -A
+kubectl get nodes
+kubectl get nodes -o wide
+
+
+kubectl get ns
+kubectl get namespaces
+
+
+#kubectl bash completion 
+dpkg -l | grep bash-completion 
+kubectl completion bash | sudo tee /etc/bash_completion.d/kubectl > /dev/null
+logout
+
+
+
+
+
+
+
+#Add Worker Nodes
+------------------
+#install Docker 
+-----------------
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+
+#install Command
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+sudo systemctl restart docker.service
+sudo systemctl enable docker
+sudo systemctl status docker
+sudo systemctl start docker
+
+#check version command
+docker --version
+
+#Must be (Cgroup Driver: systemd)
+docker info | grep -i driver
+
+dpkg -l | grep kube
+
+#Add Kubernetes Signing Key/Add Software Repositories
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+apt-get update
+
+
+#Step 3: Install Kubernetes Tools
+apt-get install kubeadm kubelet -y
+
+cat /proc/sys/net/ipv4/ip_forward
+
+#Network
+lsmod |grep overlay
+lsmod |grep br_netfilter
+cd /etc/modules-load.d/
+vi containerd.conf     
+OR
+vi /etc/modules-load.d/containerd.conf
+		# Add the following two lines to the file:
+		overlay
+		br_netfilter
+
+cat /etc/modules-load.d/containerd.conf
+modprobe overlay
+modprobe br_netfilter
+
+cat /proc/sys/net/ipv4/ip_forward
+
+cd /etc/sysctl.d/
+vi 10-k8s.conf    
+OR
+vi /etc/sysctl.d/10-k8s.conf
+	#Add the following lines to the file:
+		net.bridge.bridge-nf-call-ip6tables = 1
+		net.bridge.bridge-nf-call-iptables = 1
+		net.ipv4.ip_forward = 1
+
+systemctl daemon-reload && systemctl restart kubelet
+		
+#Error show then run command
+
+cd /etc/containerd/
+rm -fr config.toml
+systemctl restart containerd.service
+systemctl status containerd.service
+
+
+#cluster joining command
+
+#Check Version
+kubeadm version
+kubelet version
+dpkg -l | grep kube
+
+
+#Create Join token
+---------------------
+kubeadm token create
+kubeadm token create --print-join-command
+
+
+#Add master node and worker node 
+Your Kubernetes control-plane has initialized successfully!
+
+To start using your cluster, you need to run the following as a regular user:
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+Alternatively, if you are the root user, you can run:
+
+  export KUBECONFIG=/etc/kubernetes/admin.conf
+
+You should now deploy a pod network to the cluster.
+Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  https://kubernetes.io/docs/concepts/cluster-administration/addons/
+
+You can now join any number of the control-plane node running the following command on each as root:
+
+  kubeadm join 172.16.0.5:6443 --token i0jg53.xkq8hizg2gwfught \
+        --discovery-token-ca-cert-hash sha256:62002b923f7027fc76f4bba2047eaaf32def106a8accb4135dedb1e116c8ab4b \
+        --control-plane --certificate-key d076f9311c62ad66eea16967a474ce04ad4b56f8bdac43c486d86400d80f1bc3
+
+Please note that the certificate-key gives access to cluster sensitive data, keep it secret!
+As a safeguard, uploaded-certs will be deleted in two hours; If necessary, you can use
+"kubeadm init phase upload-certs --upload-certs" to reload certs afterward.
+
+Then you can join any number of worker nodes by running the following on each as root:
+
+kubeadm join 172.16.0.5:6443 --token i0jg53.xkq8hizg2gwfught \
+        --discovery-token-ca-cert-hash sha256:62002b923f7027fc76f4bba2047eaaf32def106a8accb4135dedb1e116c8ab4b
+
+
+
+
+#Note: one master node done init then back to the haproxy then configuration
+#master node
+scp /etc/kubernetes/admin.conf root@k8s-client
+
+#k8s-client node 
+
+- Add Kubernetes Signing Key/Add Software Repositories
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+apt-get update
+
+
+- Install Kubernetes Tools
+apt-get install kubectl -y
+
+
+mkdir .kube 
+cp admin.conf .kube/admin.conf
+vi .bashrc
+    export KUBECONFIG=/root/.kube/admin.conf
+    source <(kubectl completion bash)
+
