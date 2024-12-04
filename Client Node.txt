@@ -1,0 +1,15 @@
+#Client Node
+apt-get install kubectl
+kubectl version
+
+  #login master noide 
+  scp /etc/kubernetes/admin.conf root@worker2:
+
+mkdir .kube
+ls
+mv admin.conf .kube/
+vi .bashrc
+    export KUBECONFIG=/root/.kube/admin.conf
+    source <(kubectl completion bash)
+
+source .bashrc
