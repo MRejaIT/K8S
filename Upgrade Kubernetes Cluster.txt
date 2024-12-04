@@ -1,0 +1,65 @@
+
+  1. BackUp your cluster (Master Node)
+     - BackUp etcd
+     - BackUp Kubernetes Resources
+     - BackUp Persistent Volume 
+  2. Check the Current Version of kubectl/kubelet/kubeadm
+     - upgrade the kubectl and kubeadm
+     - upgrade the Kubernetes
+            -kubeadm upgrade plan
+            - kubeadm upgrade apply v1.30.6
+     - upgrade kubelet and restart kubelet service (Master Node)
+
+kubectl version
+kubectl get nodes
+kubeadm version
+kubelet --version
+kubectl get all 
+kubectl get all -A
+
+#Master Node
+-------------------------
+kubeadm version
+apt-cache madison kubeadm
+apt-cache madison kubectl
+apt-cache madison kubelet
+apt-cache madison kubeadm kubectl kubelet
+apt-mark showhold <software name>
+apt-mark unhold kubelet
+apt-get hold kubelet 
+apt-get install kubeadm=1.30.7-1.1 kubectl=1.30.7-1.1
+kubeadm version
+kubectl version
+kubectl get nodes
+kubeadm upgrade plan
+kubeadm upgrade apply v1.30.7
+kubectl get nodes
+apt-cache madison kubelet
+apt-get install kubelet=1.30.7-1.1
+systemctl restart kubelet.service
+kubectl get nodes
+
+#Worker Node
+----------------------------------
+kubectl cordon <Node Name>
+kubectl uncordon <Node Name>
+
+kubectl drain <Node Name>
+kubectl uncordon <Node Name>
+kubectl drain <Node Name> --ignore-daemonsets
+kubectl get pods -o wide 
+kubectl get nodes 
+    
+     -Login Worker Node
+kubeadm version
+kubelet --version
+apt-mark showhold
+apt-cache madison kubeadm kubelet
+apt-get install kubeadm=1.30.7-1.1 kubelet=1.30.7-1.1
+kubeadm version
+kubelet --version
+systemctl restart kubelet.service
+
+     - uncordon woker node 
+
+
