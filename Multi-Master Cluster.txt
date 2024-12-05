@@ -334,3 +334,8 @@ vi .bashrc
     export KUBECONFIG=/root/.kube/admin.conf
     source <(kubectl completion bash)
 
+
+
+#Commands
+
+kubectl expose deployment dep1 --type NodePort --port 80 --target-port 80
